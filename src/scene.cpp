@@ -1,5 +1,6 @@
 #include <scene.hpp>
 #include <math.h>
+#include <fstream>
 
 namespace my{
     Scene::Scene(int width, int height){
@@ -17,7 +18,7 @@ namespace my{
 
         m_points = new Point[200000];
 
-        double r = 1;
+        /*double r = 1;
         for(double fi = 0; fi < 6.28; fi += 0.01)
             for (double teta = 0; teta < 1.57; teta += 0.01)
             {
@@ -25,15 +26,30 @@ namespace my{
                 m_points[m_size].y = r * sin(teta) * sin(fi) + 5;
                 m_points[m_size].z = r * cos(teta);
                 m_size++;
-            }
+            }*/
     }
     Scene::~Scene(){
         if (m_points != nullptr)
             delete[] m_points;
     }
 
+
     void Scene::LifeCycle(){
         double y0 = 1;
+
+        std::ifstream inPoints("../points.txt");
+        if(!inPoints.is_open()) {
+            std::cerr << "File points.txt not found";
+            return;
+        }
+
+        std::vector<double> mas;
+        double num;
+
+        while (!inPoints.eof()) {
+            inPoints >> num;
+            mas.push_back(num);
+        }
 
         while (m_window->isOpen()) {
             sf::Event event;
@@ -68,17 +84,17 @@ namespace my{
 
             y0 += 0.02;
             m_size = 0;
-            double r = 1;
-            for (double fi = 0; fi < 6.28; fi += 0.01)
-                for (double teta = 0; teta < 1.57; teta += 0.01){
-                    m_points[m_size].x = r * sin(teta) * cos(fi);
-                    m_points[m_size].y = r * sin(teta) * sin(fi) + y0;
-                    m_points[m_size].z = r * cos(teta);
-                    m_size++;
-                }
 
-            for (int i = 0; i < m_size; i++)
-                m_camera->ProjectPoint(m_points[i], { 255, 0 ,0, 255 });
+            std::cout << std::setprecision(3) << std::fixed;
+            for(int i = 0; i < mas.size(); i++){
+                m_points[m_size].x = mas[i];
+                m_points[m_size].y = mas[i+1];
+                m_points[m_size].z = mas[i+2];
+                i+=3;
+            }
+
+            for (int i = 0; i < mas.size(); i++)
+                m_camera->ProjectPoint(m_points[i], {(uint8_t) mas[i + 3], (uint8_t) mas[i + 4], (uint8_t) mas[i + 5], 255});
 
             m_texture->update((uint8_t*)m_camera->Picture(), 1920, 1080, 0, 0);
             m_camera->Clear();
