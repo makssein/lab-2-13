@@ -2,6 +2,7 @@
 #include <math.h>
 #include <fstream>
 
+
 namespace my{
     Scene::Scene(int width, int height){
         m_width = width;
@@ -35,6 +36,7 @@ namespace my{
 
 
     void Scene::LifeCycle(){
+        std::cout << std::setprecision(3) << std::fixed;
         double y0 = 1;
 
         std::ifstream inPoints("../points.txt");
@@ -85,16 +87,20 @@ namespace my{
             y0 += 0.02;
             m_size = 0;
 
-            std::cout << std::setprecision(3) << std::fixed;
-            for(int i = 0; i < mas.size(); i++){
-                m_points[m_size].x = mas[i];
-                m_points[m_size].y = mas[i+1];
-                m_points[m_size].z = mas[i+2];
-                i+=3;
+            int k = 0;
+            for(m_size = 0; m_size < mas.size()/6; m_size++){
+                m_points[m_size].x = mas[k];
+                m_points[m_size].y = mas[k + 1];
+                m_points[m_size].z = mas[k + 2];
+                k+=6;
+
+                //std::cout << m_points[m_size].x << " " << m_points[m_size].y << " " << m_points[m_size].z << std::endl;
+            }
+            for (int i = 0; i < m_size; i++) {
+                m_camera->ProjectPoint(m_points[i],{255, 0, 0, 255});
+                //std::cout << m_points[i].x << " " << m_points[i].y << " " << m_points[i].z <<std::endl;
             }
 
-            for (int i = 0; i < mas.size(); i++)
-                m_camera->ProjectPoint(m_points[i], {(uint8_t) mas[i + 3], (uint8_t) mas[i + 4], (uint8_t) mas[i + 5], 255});
 
             m_texture->update((uint8_t*)m_camera->Picture(), 1920, 1080, 0, 0);
             m_camera->Clear();
