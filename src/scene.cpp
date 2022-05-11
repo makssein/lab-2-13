@@ -84,7 +84,7 @@ namespace my{
                 m_camera->dRoll(0.02);
             }
 
-            y0 += 0.02;
+            //y0 += 0.02;
             m_size = 0;
 
             int k = 0;
@@ -93,14 +93,13 @@ namespace my{
                 m_points[m_size].y = mas[k + 1];
                 m_points[m_size].z = mas[k + 2];
                 k+=6;
-
                 //std::cout << m_points[m_size].x << " " << m_points[m_size].y << " " << m_points[m_size].z << std::endl;
             }
+
             for (int i = 0; i < m_size; i++) {
-                m_camera->ProjectPoint(m_points[i],{255, 0, 0, 255});
+                m_camera->ProjectPoint(m_points[i],{255,0,0,255});
                 //std::cout << m_points[i].x << " " << m_points[i].y << " " << m_points[i].z <<std::endl;
             }
-
 
             m_texture->update((uint8_t*)m_camera->Picture(), 1920, 1080, 0, 0);
             m_camera->Clear();

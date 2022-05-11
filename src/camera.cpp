@@ -37,6 +37,8 @@ namespace my{
         double Y = -p.z;
         double Z = p.y;
 
+        //std::cout << X << " " << Y << " " << Z << std::endl;
+
         double a = m_angles.roll;
         double b = m_angles.pitch;
         double g = m_angles.yaw;
