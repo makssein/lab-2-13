@@ -96,9 +96,11 @@ namespace my{
                 //std::cout << m_points[m_size].x << " " << m_points[m_size].y << " " << m_points[m_size].z << std::endl;
             }
 
+            k=0;
             for (int i = 0; i < m_size; i++) {
-                m_camera->ProjectPoint(m_points[i],{255,0,0,255});
+                m_camera->ProjectPoint(m_points[i],{(uint8_t)mas[k+3],(uint8_t) mas[k+4],(uint8_t) mas[k+5],255});
                 //std::cout << m_points[i].x << " " << m_points[i].y << " " << m_points[i].z <<std::endl;
+                k+=6;
             }
 
             m_texture->update((uint8_t*)m_camera->Picture(), 1920, 1080, 0, 0);
