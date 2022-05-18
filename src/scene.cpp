@@ -13,21 +13,11 @@ namespace my{
         m_sprite = std::make_unique<sf::Sprite>(*m_texture);
 
         Intrinsic intrinsic = { 960.0, 540.0, 960.0, 540.0 };
-        Point position = { 0.0, 0.0, 0.0 };
-        Angles angles = { 0.0,0.0,0.0 };
+        Point position = { 467340.0, -60.0, 6063520.0};
+        Angles angles = { 0.0,1.8,0.0 };
         m_camera = std::make_unique<Camera>(m_width, m_height, intrinsic, position, angles);
 
-        m_points = new Point[200000];
-
-        /*double r = 1;
-        for(double fi = 0; fi < 6.28; fi += 0.01)
-            for (double teta = 0; teta < 1.57; teta += 0.01)
-            {
-                m_points[m_size].x = r * sin(teta) * cos(fi);
-                m_points[m_size].y = r * sin(teta) * sin(fi) + 5;
-                m_points[m_size].z = r * cos(teta);
-                m_size++;
-            }*/
+        m_points = new Point[400000];
     }
     Scene::~Scene(){
         if (m_points != nullptr)
@@ -45,12 +35,16 @@ namespace my{
             return;
         }
 
-        std::vector<double> mas;
-        double num;
-
-        while (!inPoints.eof()) {
-            inPoints >> num;
-            mas.push_back(num);
+        Point* points = new Point[400000];
+        Pixel* pixels = new Pixel[400000];
+        int n = 0;
+        int r,g,b;
+        while(!inPoints.eof()){
+            inPoints >> points[n].x >> points[n].y >> points[n].z >> r >> g >> b;
+            pixels[n].r = static_cast<uint8_t>(r);
+            pixels[n].g = static_cast<uint8_t>(g);
+            pixels[n].b = static_cast<uint8_t>(b);
+            n++;
         }
 
         while (m_window->isOpen()) {
@@ -83,26 +77,17 @@ namespace my{
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)){
                 m_camera->dRoll(0.02);
             }
-
-            //y0 += 0.02;
             m_size = 0;
 
-            int k = 0;
-            for(m_size = 0; m_size < mas.size()/6; m_size++){
-                m_points[m_size].x = mas[k];
-                m_points[m_size].y = mas[k + 1];
-                m_points[m_size].z = mas[k + 2];
-                k+=6;
-                //std::cout << m_points[m_size].x << " " << m_points[m_size].y << " " << m_points[m_size].z << std::endl;
+            for(int i = 0; i < n; i++){
+                m_points[i].x = points[i].x;
+                m_points[i].y = points[i].y;
+                m_points[i].z = points[i].z;
+                m_size++;
             }
-
-            k=0;
             for (int i = 0; i < m_size; i++) {
-                m_camera->ProjectPoint(m_points[i],{(uint8_t)mas[k+3],(uint8_t) mas[k+4],(uint8_t) mas[k+5],255});
-                //std::cout << m_points[i].x << " " << m_points[i].y << " " << m_points[i].z <<std::endl;
-                k+=6;
+                m_camera->ProjectPoint(m_points[i],{pixels[i].r,pixels[i].g,pixels[i].b,255});
             }
-
             m_texture->update((uint8_t*)m_camera->Picture(), 1920, 1080, 0, 0);
             m_camera->Clear();
 
